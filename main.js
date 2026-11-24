@@ -95,7 +95,7 @@
       if (e.isIntersecting) links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === '#' + e.target.id));
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
-  ['services', 'work', 'process', 'reviews', 'about', 'contact'].forEach(id => { const el = document.getElementById(id); el && secObs.observe(el); });
+  ['services', 'work', 'process', 'reviews', 'faq', 'contact'].forEach(id => { const el = document.getElementById(id); el && secObs.observe(el); });
 
   /* ---------- mobile menu ---------- */
   const burger = $('#burger'), menu = $('#mobileMenu');
@@ -174,6 +174,12 @@
 
   /* ---------- gallery (real job photos) ---------- */
   const photos = [
+    ['ig-crane', 'Boom truck lifting shingle bundles onto a roof'],
+    ['hero-1', 'Gray craftsman home with a new roof and white trim'],
+    ['ig-install', 'Roofer nailing down new decking among the pines'],
+    ['ig-detail', 'Cedar beam detail against new dark siding'],
+    ['hero-3', 'Two-story home with new roof and three-car garage'],
+    ['ig-aerial2', 'Drone view of a lakeside estate roof'],
     ['p-08', 'Log home with a new roof under a blue sky'],
     ['p-11', 'Two-story home with a new roof and three-car garage'],
     ['p-12', 'Green craftsman home with a new roof and American flag'],
@@ -205,10 +211,9 @@
     ['p-25', 'Shingle roof detail, before and after'],
     ['p-26', 'Chimney flashing, before and after']
   ];
-  const INITIAL = 12;
   const gallery = $('#gallery');
   gallery.innerHTML = photos.map(([f, alt], n) =>
-    `<figure class="${n >= INITIAL ? 'is-hidden' : ''}" data-i="${n}" style="transition-delay:${(n % 3) * 0.08}s"><img src="assets/img/${f}.jpg" alt="${alt}" loading="lazy" decoding="async"></figure>`
+    `<figure data-i="${n}" style="transition-delay:${(n % 4) * 0.07}s"><img src="assets/img/${f}.jpg" alt="${alt}" loading="lazy" decoding="async"></figure>`
   ).join('');
   const figs = $$('figure', gallery);
   const gObs = new IntersectionObserver(entries => {
@@ -217,13 +222,21 @@
   figs.forEach(f => gObs.observe(f));
 
   const moreBtn = $('#moreBtn');
-  let shown = INITIAL;
   moreBtn.addEventListener('click', () => {
-    shown += 9;
-    figs.forEach((f, n) => { if (n < shown) f.classList.remove('is-hidden'); });
-    if (shown >= figs.length) moreBtn.parentElement.remove();
+    const open = gallery.hidden;
+    gallery.hidden = !open;
+    moreBtn.setAttribute('aria-expanded', open);
+    moreBtn.firstChild.textContent = open ? 'Hide Projects ' : 'View All Projects ';
     lenis && lenis.resize();
+    if (open) goTo('#gallery');
   });
+
+  /* ---------- FAQ: one open at a time, keep smooth scroll height in sync ---------- */
+  const faqs = $$('.faq details');
+  faqs.forEach(d => d.addEventListener('toggle', () => {
+    if (d.open) faqs.forEach(o => { if (o !== d) o.open = false; });
+    lenis && lenis.resize();
+  }));
 
   /* ---------- lightbox ---------- */
   const lb = $('#lightbox'), lbImg = $('img', lb);
