@@ -130,7 +130,8 @@ section{position:relative;scroll-margin-top:var(--navh)}
 .hero__lead{max-width:512px;margin-top:32px;font-size:20px;line-height:1.4;color:var(--w70);opacity:0;animation:fadeUp 1.2s var(--out) .55s forwards}
 .hero__card{background:rgba(10,24,46,.72);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(102,255,217,.22);border-radius:var(--r);padding:32px;box-shadow:0 0 50px -10px rgba(102,255,217,.18);opacity:0;animation:fadeUp 1.2s var(--out) .7s forwards}
 .hero__card-kick{display:flex;align-items:center;gap:8px;line-height:20px;font-size:13px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--mint)}
-.hero__card-kick .ic{width:18px;height:18px}
+.hero__card-kick .ic{width:20px;height:20px}
+.hero__card .hero__card-kick{color:var(--mint);font-size:12px;font-weight:400;letter-spacing:3px;line-height:20px;margin:0}
 .hero__card h2{font-family:var(--head);font-weight:700;font-size:24px;line-height:1.25;letter-spacing:-.02em;margin-top:16px}
 .hero__card p{font-size:14px;line-height:1.625;color:var(--w60);margin-top:12px}
 .hero__card .btn{margin-top:24px}
