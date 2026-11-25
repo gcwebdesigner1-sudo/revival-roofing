@@ -170,6 +170,40 @@
     lenis && lenis.resize();
   }));
 
+  /* ---------- reviews (real Google reviews, trimmed) ---------- */
+  const mA = $('#marqueeA'), mB = $('#marqueeB');
+  if (mA && mB) {
+    const reviews = [
+      ['Allison Cross', 'Upon getting quotes, Nate was the only roofer that checked our attic. Thorough inspection, quality work at a competitive price. We highly recommend Revival!'],
+      ['Kody Duncan', 'He took his time to understand our situation, make honest recommendations, and was never pushy at all. Genuinely great guy, and great company.'],
+      ['Lynn Rice', "Nate's bid was by far the most thorough with pictures showing potential issues, and his pricing was very fair. The crew replaced a cracked truss with pictures documenting the repair."],
+      ['Les Willey', "Best experience I've ever had with a roofing job! Clean up was not only perfect when finished but also cleaned between day one and day two!"],
+      ['Christina', 'We chose Nate and Revival Roofing to re-roof our home and to do all new Hardie siding. These guys are pros! Our home turned out better than we even had in mind!'],
+      ['Brandon Bozarth', "Another company's roof leaked for two years. Nate diagnosed the issue in about 10 minutes and fixed it for a very fair price. Everything is perfect now."],
+      ['Gage Nielsen', 'The crew came, replaced the roof, cleaned up every day, and we had zero complaints. Bad decking was replaced, the shingles and flashing look great.'],
+      ['Jeff Kuhlmann', 'Nate gave a thorough and very fair quote. Lowest of any of the 5 quotes I received. Isaac and the crew did an excellent install and were very fast.'],
+      ['Kaelyn Holten', "I am extremely skeptical of all contractors. Nate's proposal was one of the most detailed and meticulous. 10 out of 10 would hire him again!"],
+      ['Stephen Anderson', "New roof, new gutters, and all the fascia replaced. His communication throughout the process was stellar. I couldn't be happier with the results."],
+      ['Catherine Harrison', 'Two companies said my roof was too steep and never gave a quote. Nate did, and his crew got it done in about 4 days. It looks so nice now.'],
+      ['D Guszregan', 'Nate is very knowledgeable, sincere, and communicated well what and why my roof needed replacement. A definite 10 out of 10!'],
+      ['Isaac Vigil', 'Our insurance company was going to drop us because of our old roof. Nate and crew got us a new roof just in time. Very careful with the landscaping.'],
+      ['Dennis Moore', 'The price and workmanship was excellent and they did not use any high pressure sales tactics, which was a big plus!'],
+      ['Susan McInnis', 'The crew showed up on time. They did an outstanding job. Very respectful of my property. Nate was very easy to work with.'],
+      ['Ned Hughes', 'I was in a pinch due to selling my house and he accommodated my timeline and got it done right. Would recommend to everyone!']
+    ];
+    const card = ([name, text]) => `
+      <article class="rv">
+        <div class="rv__stars" aria-label="5 stars">★★★★★</div>
+        <p>“${text}”</p>
+        <footer><span class="rv__av" aria-hidden="true">${name[0]}</span><span>${name}<small>Google review</small></span></footer>
+      </article>`;
+    const half = Math.ceil(reviews.length / 2);
+    const fill = (el, list) => { const h = list.map(card).join(''); el.innerHTML = reduce ? h : h + h; };
+    fill(mA, reviews.slice(0, half));
+    fill(mB, reviews.slice(half));
+    if (!reduce) [mA, mB].forEach(m => $$('.rv', m).slice(m.children.length / 2).forEach(c => c.setAttribute('aria-hidden', 'true')));
+  }
+
   /* ---------- project filters ---------- */
   const filters = $('#filters');
   if (filters) {
