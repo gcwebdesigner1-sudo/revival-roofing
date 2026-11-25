@@ -1,0 +1,562 @@
+import sys, pathlib
+OUT = pathlib.Path(sys.argv[1])
+
+SPRITE = '''<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-5.5 10.2-7.4 11.8a1 1 0 0 1-1.2 0C9.5 20.2 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></symbol>
+<symbol id="i-lr" viewBox="0 0 24 24"><path d="m18 8 4 4-4 4"/><path d="m6 8-4 4 4 4"/><path d="M2 12h20"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.12 2.12 0 0 0 1.6 1.16l5.16.76a.53.53 0 0 1 .3.9l-3.74 3.64a2.12 2.12 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.12 2.12 0 0 0-1.97 0L6.4 21.01a.53.53 0 0 1-.77-.56l.88-5.14a2.12 2.12 0 0 0-.61-1.88L2.16 9.8a.53.53 0 0 1 .29-.9l5.17-.76a2.12 2.12 0 0 0 1.6-1.16z"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .71-1.53l7-6a2 2 0 0 1 2.58 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+<symbol id="i-hammer" viewBox="0 0 24 24"><path d="m15 12-8.37 8.37a1 1 0 1 1-3-3L12 9"/><path d="m18 15 4-4"/><path d="m21.5 11.5-1.91-1.91A2 2 0 0 1 19 8.17V7l-2.26-1.13a6 6 0 0 0-2.98-.87H11l.92.82A6.18 6.18 0 0 1 14 10.43V12l2 2h1.17a2 2 0 0 1 1.42.59L20.5 16.5"/></symbol>
+<symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></symbol>
+<symbol id="i-storm" viewBox="0 0 24 24"><path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24"/><path d="M16 14v6M8 14v6M12 16v6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+</svg>'''
+
+def ic(name, cls="ic"):
+    return f'<svg class="{cls}" aria-hidden="true"><use href="#i-{name}"/></svg>'
+
+LOGO = '''<svg viewBox="0 0 52 52" aria-hidden="true"><rect x="12" y="12" width="28" height="28" transform="rotate(45 26 26)" fill="none" stroke="#66ffd9" stroke-width="2"/><rect x="21" y="21" width="10" height="10" fill="#66ffd9"/></svg>'''
+
+def head(title, desc, preload=None):
+    pl = f'<link rel="preload" as="image" href="{preload}">\n' if preload else ''
+    return f'''<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{title}</title>
+<meta name="description" content="{desc}">
+<meta name="theme-color" content="#050f1e">
+<link rel="icon" href="favicon-48.png" sizes="48x48" type="image/png">
+<link rel="icon" href="favicon.png" sizes="512x512" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="canonical" href="__CANON__">
+<meta property="og:type" content="website">
+<meta property="og:url" content="__CANON__">
+<meta property="og:site_name" content="Revival Roofing and Exteriors">
+<meta property="og:title" content="Revival Roofing and Exteriors">
+<meta property="og:description" content="We Are the Revival of Roofing Done Right! Over 20 years of master craftsmanship protecting homes across North Idaho &amp; Eastern Washington.">
+<meta property="og:image" content="https://www.revivalroofingandexteriors.com/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter+Tight:wght@700;800&family=Public+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+{pl}<link rel="stylesheet" href="styles.css?v=12">
+<script type="application/ld+json">
+{{"@context":"https://schema.org","@type":"RoofingContractor","name":"Revival Roofing and Exteriors","telephone":"+1-206-715-6359","email":"revivalroofingandexteriors@gmail.com","url":"https://www.revivalroofingandexteriors.com/","image":"https://www.revivalroofingandexteriors.com/og-image.jpg","logo":"https://www.revivalroofingandexteriors.com/favicon.png","aggregateRating":{{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"37"}},"hasMap":"{GOOGLE}","areaServed":["Coeur d'Alene","Post Falls","Hayden","Sandpoint","Liberty Lake","Spokane","Spokane Valley","Chewelah","Newport","Priest River","Bonners Ferry","Kellogg"]}}
+</script>
+</head>
+'''
+
+def nav(active, solid=False):
+    links = [("Home","index.html"),("Services","index.html#services"),("Projects","projects.html"),("Estimate","estimate.html"),("Contact","contact.html")]
+    la = "\n".join(f'      <a href="{h}"{" class=\"is-active\" aria-current=\"page\"" if n==active else ""}>{n}</a>' for n,h in links)
+    ma = "\n".join(f'    <a href="{h}">{n}</a>' for n,h in links)
+    sc = " nav--solid" if solid else ""
+    return f'''<body>
+{SPRITE}
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav{sc}" id="nav">
+  <div class="wrap nav__inner">
+    <a href="index.html" class="brand" aria-label="Revival Roofing and Exteriors home">
+      {LOGO}
+      <span>Revival<b>Roofing &amp; Exteriors</b></span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+{la}
+    </nav>
+    <a class="nav__phone" href="tel:+12067156359">{ic("phone")}(206) 715-6359</a>
+    <a class="btn btn--mint nav__cta" href="estimate.html">Get Your Estimate</a>
+    <a class="nav__est" href="estimate.html">Estimate</a>
+    <button class="nav__burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span></button>
+  </div>
+</header>
+<div class="mmenu" id="mobileMenu" hidden>
+  <nav aria-label="Mobile">
+{ma}
+  </nav>
+  <div class="mmenu__cta">
+    <a class="btn btn--mint btn--block btn--lg" href="estimate.html">Get Your Free Estimate {ic("arrow")}</a>
+    <a class="btn btn--line btn--block btn--lg" href="tel:+12067156359">{ic("phone")}Call (206) 715-6359</a>
+  </div>
+</div>
+'''
+
+AREAS = ["Coeur d'Alene","Post Falls","Hayden","Sandpoint","Liberty Lake","Spokane","Spokane Valley","Chewelah","Newport","Priest River","Bonners Ferry","Kellogg"]
+
+def foot(callbar=True):
+    fa = "".join(f"<li>{a}</li>" for a in AREAS)
+    cb = f'''<div class="callbar" id="callbar">
+  <a href="tel:+12067156359" class="callbar__call">{ic("phone")}Call</a>
+  <a href="estimate.html" class="callbar__quote">Get Free Estimate {ic("arrow")}</a>
+</div>
+''' if callbar else ''
+    return f'''<footer class="foot">
+  <div class="wrap foot__grid">
+    <div class="foot__brand">
+      <a href="index.html" class="brand" aria-label="Revival Roofing and Exteriors home">
+        {LOGO}
+        <span>Revival<b>Roofing &amp; Exteriors</b></span>
+      </a>
+      <p>We Are the Revival of Roofing Done Right! Premier roofing contractor proudly serving North Idaho &amp; Eastern Washington. Over two decades of craftsmanship protecting what matters most.</p>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul class="foot__list">
+        <li>{ic("phone")}<a href="tel:+12067156359">(206) 715-6359</a></li>
+        <li>{ic("mail")}<a href="mailto:revivalroofingandexteriors@gmail.com">revivalroofingandexteriors@gmail.com</a></li>
+        <li>{ic("pin")}<span>North Idaho &amp; Eastern Washington</span></li>
+        <li>{ic("shield")}<span>ID #6171541 · WA #REVIVRE 751 BU</span></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Service Areas</h4>
+      <ul class="foot__areas">{fa}</ul>
+    </div>
+  </div>
+  <div class="wrap foot__bottom">
+    <span>&copy; <span id="yr">2026</span> Revival Roofing and Exteriors. All rights reserved.</span>
+    <span class="foot__links"><a href="estimate.html">Get an Estimate</a><a href="contact.html">Contact</a></span>
+  </div>
+  <p class="jj-credit">Website by <a href="https://www.jjstudiowd.com/">JJ Studio</a></p>
+</footer>
+{cb}<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
+<script src="main.js?v=12" defer></script>
+</body>
+</html>
+'''
+
+# ---------------- HOME ----------------
+SERVICES = [
+ ("b44-replace","Roof Replacement","Full re-roof projects engineered for longevity — from tear-off to final inspection.","50-Year Material","12 color options"),
+ ("b44-metal","Metal Roofing","Standing seam and metal panel systems built for mountain weather and century-spanning durability.","Lifetime Structural","8 color options"),
+ ("b44-siding","Siding &amp; Exteriors","Premium siding installation that protects and elevates your home's curb appeal.","40-Year Weather","16 color options"),
+ ("b44-storm","Storm Damage Restoration","Rapid response inspection and restoration after hail, wind, and heavy weather events.","Insurance Approved","Full documentation"),
+ ("b44-repair","Roof Repair","Targeted repairs for leaks, missing shingles, and localized damage before they spread.","5-Year Workmanship","Free inspection"),
+ ("b44-inspect","Roof Inspections","Detailed inspections with documentation you can trust — for peace of mind or pre-sale.","Photo Report","Same-week scheduling"),
+]
+svc_html = "\n".join(f'''      <a class="svc reveal" href="estimate.html">
+        <img src="assets/img/{img}.jpg" alt="{t}" loading="lazy">
+        <div class="svc__body">
+          <h3>{t}</h3>
+          <p>{d}</p>
+          <div class="svc__spec"><span>{a}</span><span>{b}</span></div>
+          <span class="svc__more">Learn more {ic("arrow")}</span>
+        </div>
+      </a>''' for img,t,d,a,b in SERVICES)
+
+STEPS = [
+ ("01","Free Inspection","We climb the ladder so you don't have to — a thorough, documented assessment of your roof and exterior."),
+ ("02","Honest Estimate","You receive a clear, itemized estimate with material options and no pressure. Real numbers, real scope."),
+ ("03","Expert Installation","Our crew executes with precision — protecting your property, installing to manufacturer spec, and cleaning up daily."),
+ ("04","The Revival","A home renewed. We walk the final inspection with you and stand behind our workmanship warranty."),
+]
+steps_html = "\n".join(f'''      <div class="step reveal">
+        <span class="step__n">{n}</span>
+        <h3>{t}</h3>
+        <p>{d}</p>
+      </div>''' for n,t,d in STEPS)
+
+FAQ = [
+ ("How do I know if I need a repair or a full replacement?","We perform a thorough, documented inspection and give you an honest assessment. If a repair solves the problem cost-effectively, that's what we recommend. If the roof is at end-of-life or broadly damaged, we'll lay out the replacement options with clear pricing."),
+ ("How much does a new roof cost in North Idaho?","Every roof is different — material choice, roof complexity, and square footage all factor in. After a free inspection we provide a detailed, itemized estimate with no hidden fees so you know exactly what you're paying for."),
+ ("How long does a roof replacement take?","Most residential re-roofs are completed in 1–3 days depending on size and weather. We protect your property throughout, clean up daily, and keep you informed at every step."),
+ ("Do you work with homeowners' insurance for storm damage?","Yes. We document storm damage thoroughly, meet with your adjuster on-site, and handle the paperwork so the claim process is as smooth as possible."),
+ ("Are you licensed and insured?","Yes — Revival Roofing and Exteriors is fully licensed and insured. Our Idaho registration is #6171541 and our Washington license is REVIVRE 751 BU."),
+]
+faq_html = "\n".join(f'''      <details{" open" if i==0 else ""}>
+        <summary>{q}</summary>
+        <div><p>{a}</p></div>
+      </details>''' for i,(q,a) in enumerate(FAQ))
+
+stars = '<span class="stars">' + ic("star")*5 + '</span>'
+GOOGLE = "https://www.google.com/maps/place/Revival+Roofing+and+Exteriors/@47.6767139,-117.1677575,10z/data=!4m8!3m7!1s0x41d280bad6f64ef7:0xdc90e0acea992676!8m2!3d47.6767139!4d-117.1677576!9m1!1b1!16s%2Fg%2F11x0xtjssj"
+areas_html = "".join(f"<li>{ic('pin')}{a}</li>" for a in AREAS)
+
+PROJECTS = [
+ ("b44-estate","Roof Replacement","2024-09","Coeur d'Alene Estate Re-Roof","Coeur d'Alene, ID · Architectural Shingle","replacement"),
+ ("b44-farmhouse","Metal Roofing","2024-06","Liberty Lake Modern Farmhouse","Liberty Lake, WA · Standing Seam","metal"),
+ ("b44-storm","Storm Damage Restoration","2024-03","Hayden Storm Recovery","Hayden, ID · Architectural Shingle","storm"),
+ ("b44-repair","Roof Replacement","2023-11","Spokane Valley Barn Roof","Spokane Valley, WA · Metal Panel","replacement"),
+]
+def feature(p, num=None, total=4):
+    img,tag,date,title,meta,cat = p
+    n = f'<span class="feature__num">{num:02d} / {total:02d}</span>' if num else ''
+    return f'''      <a class="feature reveal" href="estimate.html" data-cat="{cat}">
+        <img src="assets/img/{img}.jpg" alt="{title}" loading="lazy">
+        {n}
+        <div class="feature__body">
+          <p class="feature__tag">{tag} <i></i> {date}</p>
+          <h3>{title}</h3>
+          <p class="feature__meta">{meta}</p>
+        </div>
+      </a>'''
+
+home = head("Revival Roofing and Exteriors | North Idaho &amp; Eastern Washington",
+ "We Are the Revival of Roofing Done Right! Roof replacement, metal roofing, siding and storm damage restoration across North Idaho &amp; Eastern Washington. Call (206) 715-6359.",
+ "assets/img/b44-hero.jpg") + nav("Home") + f'''
+<main id="main">
+
+<!-- HERO -->
+<section class="hero" id="top" aria-label="Revival Roofing and Exteriors">
+  <div class="hero__media" id="heroMedia" role="img" aria-label="Premium roofline at blue hour"></div>
+  <div class="hero__shade" aria-hidden="true"></div>
+  <div class="grid-bg" aria-hidden="true"></div>
+  <div class="wrap hero__inner" id="heroContent">
+    <div>
+      <p class="hero__kicker">North Idaho &amp; Eastern Washington</p>
+      <h1 class="hero__name">
+        <span class="hero__mask"><span class="hero__word">Revival</span></span>
+        <span class="hero__mask hero__mask--indent"><span class="hero__word">Exteriors</span></span>
+      </h1>
+      <p class="hero__lead">We Are the Revival of Roofing Done Right! Over 20 years of master craftsmanship protecting homes across North Idaho &amp; Eastern Washington.</p>
+    </div>
+    <div class="hero__card">
+      <p class="hero__card-kick">{ic("shield")}Free Inspection</p>
+      <h2>Get Your Free Roof Estimate</h2>
+      <p>Honest assessment, clear pricing, no pressure. See what your roof needs before anyone climbs a ladder.</p>
+      <a class="btn btn--mint btn--block" id="heroCta" href="estimate.html">Start Your Estimate {ic("arrow")}</a>
+      <a class="btn btn--line btn--block hero__call" href="tel:+12067156359">{ic("phone")}Call (206) 715-6359</a>
+      <div class="trust"><span>Licensed &amp; Insured</span><i></i><span>20+ Years</span><i></i><span>4.9★ Rated</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats" aria-label="At a glance">
+  <div class="wrap">
+    <div class="stats__grid">
+      <div class="stat reveal"><strong><span data-count="20">20</span>+</strong><span>Years Experience</span></div>
+      <div class="stat reveal"><strong><span data-count="500">500</span>+</strong><span>Projects Completed</span></div>
+      <div class="stat reveal"><strong><span data-count="4.9" data-dec="1">4.9</span>★</strong><span>Customer Rating</span></div>
+      <div class="stat reveal"><strong><span data-count="100">100</span>%</strong><span>Licensed &amp; Insured</span></div>
+    </div>
+    <p class="stats__lic reveal">{stars}<span>·</span><span>Licensed &amp; Insured · ID #6171541 · WA #REVIVRE 751 BU</span></p>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="sec light lines" id="services">
+  <div class="wrap">
+    <header class="head reveal">
+      <p class="eyebrow">The Material Matrix</p>
+      <h2 class="h2">Materials engineered for the mountain life.</h2>
+      <p class="lede">From architectural shingles to standing-seam metal, we install systems built to take everything North Idaho weather throws at them. Hover a material to see durability and options.</p>
+    </header>
+    <p class="swipe-hint" aria-hidden="true">Swipe to explore {ic("arrow")}</p>
+    <div class="svc-grid">
+{svc_html}
+    </div>
+    <div class="center reveal"><a class="btn btn--ink" href="estimate.html">Explore All Services</a></div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section class="sec dark grid" id="before-after">
+  <div class="wrap">
+    <header class="head reveal">
+      <p class="eyebrow">The Transformation Engine</p>
+      <h2 class="h2">Drag to witness the revival.</h2>
+      <p class="lede">Storm-beaten to pristine. Slide the divider to see the difference two decades of craftsmanship makes.</p>
+    </header>
+    <div class="ba__frame reveal" id="baFrame">
+      <img src="assets/img/b44-storm.jpg" alt="After revival" class="ba__img" draggable="false">
+      <div class="ba__before"><img src="assets/img/b44-repair.jpg" alt="Before revival" class="ba__img" draggable="false"></div>
+      <span class="ba__tag ba__tag--l">Before</span>
+      <span class="ba__tag ba__tag--r">After</span>
+      <div class="ba__handle"><span>{ic("lr")}</span></div>
+      <input type="range" min="0" max="100" value="50" step="0.1" class="ba__range" id="baRange" aria-label="Before and after comparison slider">
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="sec light lines" id="process">
+  <div class="wrap">
+    <header class="head reveal">
+      <p class="eyebrow">The Process</p>
+      <h2 class="h2">A process built on honesty.</h2>
+      <p class="lede">No surprises, no pressure. Just a clear path from first inspection to a home renewed.</p>
+    </header>
+    <div class="steps">
+{steps_html}
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="story light lines" id="about">
+  <div class="wrap story__grid">
+    <div class="story__media reveal">
+      <div class="story__img"><img src="assets/img/b44-inspect.jpg" alt="Craftsmanship at work" loading="lazy" id="storyImg"></div>
+      <div class="story__badge"><strong>20+</strong><span>Years of master<br>craftsmanship</span></div>
+    </div>
+    <div class="story__copy reveal">
+      <p class="eyebrow">Our Story</p>
+      <h2 class="h2 h2--md">North Idaho native. Roofing done right.</h2>
+      <p>As a North Idaho native, I bring over 20 years of experience in the contracting industry to every project. Revival Roofing and Exteriors was built on a simple belief: roofing should be done right — the first time.</p>
+      <p>We've completed hundreds of projects ranging from small renovations and barn roofs to large-scale commercial and residential re-roof projects. We don't cut corners. We protect homes like they're our own.</p>
+      <div class="story__nums">
+        <div><strong>500+</strong><span>Projects</span></div>
+        <div><strong>100%</strong><span>Insured</span></div>
+        <div><strong>4.9★</strong><span>Rated</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="sec deep grid" id="work">
+  <div class="wrap">
+    <header class="head head--split reveal">
+      <div>
+        <p class="eyebrow">Recent Work</p>
+        <h2 class="h2">Proof of the revival.</h2>
+      </div>
+      <a class="btn btn--line" href="projects.html">View All Projects {ic("arrow")}</a>
+    </header>
+    <p class="swipe-hint" aria-hidden="true">Swipe for more {ic("arrow")}</p>
+    <div class="feature-grid">
+{feature(PROJECTS[0])}
+{feature(PROJECTS[1])}
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews dark grid" id="reviews">
+  <div class="wrap">
+    <header class="head head--center reveal">
+      <p class="eyebrow eyebrow--center">Reviews</p>
+      <div class="rating">
+        <span class="rating__num">4.9</span>
+        <span class="rating__stars" aria-label="4.9 out of 5 stars">★★★★★</span>
+      </div>
+      <h2 class="h2 h2--md">37 Google reviews and counting.</h2>
+    </header>
+  </div>
+  <div class="marquee-wrap">
+    <div class="marquee" id="marqueeA"></div>
+    <div class="marquee marquee--rev" id="marqueeB"></div>
+  </div>
+  <div class="wrap reviews__cta reveal">
+    <a class="btn btn--line" href="{GOOGLE}" target="_blank" rel="noopener">Read them all on Google {ic("arrow")}</a>
+  </div>
+</section>
+
+<!-- AREAS -->
+<section class="sec light lines" id="areas">
+  <div class="wrap areas__grid">
+    <div class="reveal">
+      <p class="eyebrow">Service Areas</p>
+      <h2 class="h2 h2--md">Proudly serving North Idaho &amp; Eastern Washington.</h2>
+      <p class="lede">From Coeur d'Alene to Spokane and everywhere between — if you're in our region, we're ready to climb your ladder.</p>
+    </div>
+    <ul class="areas__list reveal">{areas_html}</ul>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec dark grid faq" id="faq">
+  <div class="wrap">
+    <header class="head head--center reveal">
+      <p class="eyebrow eyebrow--center">Questions</p>
+      <h2 class="h2 h2--md">Straight answers, no pressure.</h2>
+    </header>
+    <div class="faq__list reveal">
+{faq_html}
+    </div>
+    <p class="faq__more reveal">Still have questions? <a href="contact.html">Get in touch →</a></p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta deep grid" id="contact">
+  <div class="wrap reveal">
+    <h2 class="cta__title">Ready for your <span>Revival?</span></h2>
+    <p class="lede">Get a free, honest estimate. Know what your roof needs before anyone climbs a ladder.</p>
+    <a class="btn btn--mint btn--lg" href="estimate.html">Start Your Free Estimate {ic("arrow")}</a>
+    <p class="cta__call">Or call <a href="tel:+12067156359">(206) 715-6359</a> — we answer.</p>
+  </div>
+</section>
+
+</main>
+''' + foot()
+
+# ---------------- PROJECTS ----------------
+proj_cards = "\n".join(feature(p, i+1) for i,p in enumerate(PROJECTS))
+projects = head("Projects | Revival Roofing and Exteriors", "Recent roof replacements, metal roofs and storm restorations across North Idaho &amp; Eastern Washington.") + nav("Projects", solid=True) + f'''
+<main id="main">
+<section class="pagehead grid">
+  <div class="wrap reveal">
+    <p class="eyebrow">Portfolio</p>
+    <h1>Projects</h1>
+    <p class="lede">A selection of recent revivals across North Idaho &amp; Eastern Washington.</p>
+  </div>
+</section>
+<section class="sec light lines">
+  <div class="wrap">
+    <div class="filters reveal" id="filters">
+      <button class="is-on" data-f="all">All</button>
+      <button data-f="replacement">Roof Replacement</button>
+      <button data-f="metal">Metal Roofing</button>
+      <button data-f="storm">Storm Damage Restoration</button>
+    </div>
+    <div class="feature-grid" id="projGrid">
+{proj_cards}
+    </div>
+    <div class="ctabox reveal">
+      <h2>Ready to start your project?</h2>
+      <p>Let's add your home to the revival.</p>
+      <a class="btn btn--mint" href="estimate.html">Get Your Estimate {ic("arrow")}</a>
+    </div>
+  </div>
+</section>
+</main>
+''' + foot()
+
+# ---------------- CONTACT ----------------
+contact = head("Contact | Revival Roofing and Exteriors", "Call (206) 715-6359 or send a message. Revival Roofing and Exteriors serves North Idaho &amp; Eastern Washington.") + nav("Contact", solid=True) + f'''
+<main id="main">
+<section class="pagehead grid">
+  <div class="wrap reveal">
+    <p class="eyebrow">Get in Touch</p>
+    <h1>Contact</h1>
+    <p class="lede">Drop us a line — we answer the phone and we climb the ladder. Let's talk about your project.</p>
+  </div>
+</section>
+<section class="sec light lines">
+  <div class="wrap contact__grid">
+    <div class="reveal">
+      <h2>Contact Details</h2>
+      <ul class="cdetails">
+        <li><span class="cdetails__ic">{ic("phone")}</span><div><small>Phone</small><b><a href="tel:+12067156359">(206) 715-6359</a></b></div></li>
+        <li><span class="cdetails__ic">{ic("mail")}</span><div><small>Email</small><b><a href="mailto:revivalroofingandexteriors@gmail.com">revivalroofingandexteriors@gmail.com</a></b></div></li>
+        <li><span class="cdetails__ic">{ic("pin")}</span><div><small>Service Region</small><b>North Idaho &amp; Eastern Washington</b><em>Coeur d'Alene · Post Falls · Hayden · Sandpoint · Liberty Lake · Spokane &amp; more</em></div></li>
+        <li><span class="cdetails__ic">{ic("shield")}</span><div><small>Licensed &amp; Insured</small><b>ID #6171541 · WA #REVIVRE 751 BU</b></div></li>
+        <li><span class="cdetails__ic">{ic("clock")}</span><div><small>Hours</small><b>Mon–Fri: 7am–6pm · Sat: 8am–2pm</b></div></li>
+      </ul>
+    </div>
+    <form class="form reveal" id="contactForm" data-subject="New message from the website" novalidate>
+      <h2>Send us a message</h2>
+      <label>Name<input name="name" autocomplete="name" placeholder="Your name" required></label>
+      <div class="form__row">
+        <label>Email<input name="email" type="email" autocomplete="email" placeholder="you@email.com" required></label>
+        <label>Phone<input name="phone" type="tel" autocomplete="tel" placeholder="(206) 555-0100"></label>
+      </div>
+      <label>Message<textarea name="message" placeholder="Tell us about your project..." required></textarea></label>
+      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn btn--mint btn--block" type="submit">Send Message {ic("arrow")}</button>
+      <p class="form__note" role="status"></p>
+    </form>
+  </div>
+</section>
+</main>
+''' + foot()
+
+# ---------------- ESTIMATE ----------------
+estimate = head("Free Estimate | Revival Roofing and Exteriors", "Get a free, honest roof estimate from Revival Roofing and Exteriors in four quick steps.") + nav("Estimate", solid=True) + f'''
+<main id="main">
+<section class="est deep grid">
+  <div class="wrap">
+    <div class="est__box" id="est">
+      <div class="est__top"><span id="estCount">Step 1 of 4</span><button class="est__back" id="estBack" type="button" hidden>{ic("back")}Back</button></div>
+      <div class="est__bar"><span id="estBar"></span></div>
+
+      <div class="est__step" data-step="1" data-key="service">
+        <h1>What are we reviving?</h1>
+        <p class="est__sub">Choose the service you need — we'll tailor your estimate.</p>
+        <div class="est__opts">
+          <button class="est__opt" type="button">{ic("home")}Roof Replacement</button>
+          <button class="est__opt" type="button">{ic("hammer")}Roof Repair</button>
+          <button class="est__opt" type="button">{ic("building")}Siding &amp; Exteriors</button>
+          <button class="est__opt" type="button">{ic("storm")}Storm Damage</button>
+        </div>
+        <button class="est__skip" type="button">Skip this step →</button>
+      </div>
+
+      <div class="est__step" data-step="2" data-key="property" hidden>
+        <h1>What type of property?</h1>
+        <p class="est__sub">So we bring the right crew and materials.</p>
+        <div class="est__opts">
+          <button class="est__opt" type="button">{ic("home")}Single Family Home</button>
+          <button class="est__opt" type="button">{ic("building")}Townhome / Multi-unit</button>
+          <button class="est__opt" type="button">{ic("building")}Commercial / Barn</button>
+          <button class="est__opt" type="button">{ic("hammer")}Not sure</button>
+        </div>
+        <button class="est__skip" type="button">Skip this step →</button>
+      </div>
+
+      <div class="est__step" data-step="3" data-key="timeline" hidden>
+        <h1>How soon do you need this?</h1>
+        <p class="est__sub">We prioritize based on your timeline.</p>
+        <div class="est__opts">
+          <button class="est__opt" type="button">{ic("storm")}Emergency — active leak</button>
+          <button class="est__opt" type="button">{ic("home")}Within the next month</button>
+          <button class="est__opt" type="button">{ic("hammer")}Planning ahead</button>
+          <button class="est__opt" type="button">{ic("building")}Just exploring options</button>
+        </div>
+        <button class="est__skip" type="button">Skip this step →</button>
+      </div>
+
+      <div class="est__step" data-step="4" hidden>
+        <h1>Almost there.</h1>
+        <p class="est__sub">Where should we send your estimate?</p>
+        <form class="form" id="estForm" data-subject="New estimate request from the website" novalidate>
+          <label>Name<input name="name" autocomplete="name" placeholder="Your name" required></label>
+          <div class="form__row">
+            <label>Email<input name="email" type="email" autocomplete="email" placeholder="you@email.com" required></label>
+            <label>Phone<input name="phone" type="tel" autocomplete="tel" placeholder="(206) 555-0100" required></label>
+          </div>
+          <label>Anything else? (optional)<textarea name="message" placeholder="Tell us about your project..."></textarea></label>
+          <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button class="btn btn--mint btn--block" type="submit">Submit Estimate Request {ic("arrow")}</button>
+          <p class="form__note" role="status"></p>
+        </form>
+      </div>
+
+      <p class="est__talk" id="estTalk">Prefer to talk? <a href="tel:+12067156359">{ic("phone")}Call (206) 715-6359</a></p>
+
+      <div class="est__step est__done" data-step="5" hidden>
+        {ic("check")}
+        <h1>Estimate Request Received</h1>
+        <p class="est__sub">Thanks! We'll reach out shortly to schedule your free inspection. Need us sooner? Call <a href="tel:+12067156359" style="color:var(--mint)">(206) 715-6359</a>.</p>
+        <a class="btn btn--line" href="index.html" style="margin-top:32px">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+''' + foot(callbar=False)
+
+notfound = head("Page Not Found | Revival Roofing and Exteriors", "This page could not be found.") + nav("", solid=True) + f'''
+<main id="main">
+<section class="est deep grid">
+  <div class="wrap" style="text-align:center">
+    <p class="eyebrow eyebrow--center">Error 404</p>
+    <h1 class="pagehead" style="background:none;padding:0;font-family:var(--bebas);font-weight:400;font-size:clamp(72px,14vw,140px);line-height:1">Page not found</h1>
+    <p class="lede" style="max-width:520px;margin:20px auto 0">That page doesn't exist, but your free roof estimate does.</p>
+    <p style="margin-top:36px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a class="btn btn--mint" href="/estimate.html">Get Your Free Estimate {ic("arrow")}</a><a class="btn btn--line" href="/">Back to Home</a></p>
+  </div>
+</section>
+</main>
+''' + foot()
+SITE = "https://www.revivalroofingandexteriors.com/"
+pages = [("index.html", home, ""), ("projects.html", projects, "projects.html"), ("contact.html", contact, "contact.html"), ("estimate.html", estimate, "estimate.html"), ("404.html", notfound, "404.html")]
+for name, html, path in pages:
+    html = html.replace("__CANON__", SITE + path)
+    if name == "404.html":
+        import re as _re
+        html = _re.sub(r'<link rel="canonical"[^>]*>\n', '', html)
+        html = _re.sub(r'<meta property="og:url"[^>]*>\n', '', html)
+        html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="/">\n<meta name="robots" content="noindex">')
+    (OUT / name).write_text(html, encoding="utf-8", newline="\n")
+    print("wrote", name, len(html))
