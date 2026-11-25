@@ -128,23 +128,39 @@
       raf = requestAnimationFrame(loop);
     };
     const go = v => { target = Math.max(0, Math.min(100, v)); if (!raf) raf = requestAnimationFrame(loop); };
-    range.addEventListener('input', () => { touched = true; go(+range.value); });
-    ba.addEventListener('pointermove', e => {
-      if (e.pointerType !== 'mouse') return;
-      touched = true;
-      const r = ba.getBoundingClientRect();
-      go(((e.clientX - r.left) / r.width) * 100);
+    // drag-only slider: the divider moves while the pointer is held down, like base44
+    let dragging = false;
+    const at = e => { const r = ba.getBoundingClientRect(); return ((e.clientX - r.left) / r.width) * 100; };
+    range.style.pointerEvents = 'none';
+    ba.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      dragging = true;
+      ba.setPointerCapture(e.pointerId);
+      ba.classList.add('is-drag');
+      go(at(e));
     });
-    if (!reduce) {
-      const sio = new IntersectionObserver(en => {
-        if (!en[0].isIntersecting || touched) return;
-        sio.disconnect();
-        setTimeout(() => !touched && go(22), 500);
-        setTimeout(() => !touched && go(78), 1700);
-        setTimeout(() => !touched && go(50), 2900);
-      }, { threshold: 0.6 });
-      sio.observe(ba);
-    }
+    ba.addEventListener('pointermove', e => { if (dragging) go(at(e)); });
+    const stop = () => { dragging = false; ba.classList.remove('is-drag'); };
+    ba.addEventListener('pointerup', stop);
+    ba.addEventListener('pointercancel', stop);
+    range.addEventListener('input', () => go(+range.value)); // keyboard users
+  }
+
+  /* ---------- process: highlight on hover; on touch, light the step in view ---------- */
+  const stepEls = $$('.step');
+  if (stepEls.length && matchMedia('(hover: none)').matches) {
+    const lit = () => {
+      const mid = window.innerHeight / 2;
+      let best = null, bestD = Infinity;
+      stepEls.forEach(s => {
+        const r = s.getBoundingClientRect();
+        const d = Math.abs(r.top + r.height / 2 - mid);
+        if (r.bottom > 0 && r.top < window.innerHeight && d < bestD) { bestD = d; best = s; }
+      });
+      stepEls.forEach(s => s.classList.toggle('is-lit', s === best && bestD < window.innerHeight * 0.35));
+    };
+    window.addEventListener('scroll', lit, { passive: true });
+    lit();
   }
 
   /* ---------- FAQ: one open at a time ---------- */
