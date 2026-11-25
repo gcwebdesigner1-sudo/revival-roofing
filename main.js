@@ -43,7 +43,12 @@
     if (y !== lastY) {
       lastY = y;
       if (nav) nav.classList.toggle('is-solid', y > 40);
-      if (callbar) callbar.classList.toggle('is-on', y > window.innerHeight * 0.6);
+      if (callbar) {
+        // phones: bar shows once the hero estimate button has scrolled away (or right away on other pages)
+        const heroCta = document.getElementById('heroCta');
+        const show = heroCta ? heroCta.getBoundingClientRect().bottom < 0 : y > 80;
+        callbar.classList.toggle('is-on', show);
+      }
       if (!reduce) {
         const h = window.innerHeight;
         if (heroMedia && y < h * 1.2) heroMedia.style.translate = `0 ${y * 0.3}px`;
@@ -271,6 +276,8 @@
       count.textContent = done ? 'Complete' : `Step ${n} of 4`;
       bar.style.width = (done ? 100 : ((n - 1) / 4) * 100) + '%';
       back.hidden = n === 1 || done;
+      const talk = $('#estTalk');
+      if (talk) talk.hidden = done;
       window.scrollTo(0, 0);
       lenis && lenis.resize();
     };
